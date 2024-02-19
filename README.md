@@ -21,4 +21,4 @@ Clone the repository:
 ```bash
 git clone https://github.com/yourusername/Davisware_Automation_Framework.git
 cd Davisware_Automation_Framework
-DAV_AUTOM
+git
