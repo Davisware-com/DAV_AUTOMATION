@@ -1,4 +1,4 @@
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -53,9 +53,22 @@ class PageBase:
         element = self.find_element(locator, timeout)
         element.click()
 
-    def double_click_element(self, locator, timeout=10):
-        element = self.find_element(locator, timeout)
-        ActionChains(self.driver).double_click(element).perform()
+    # def double_click_element(self, locator, timeout=10):
+    #     element = self.find_element(locator, timeout)
+    #     ActionChains(self.driver).double_click(element).perform()
+    def double_click(self, locator, timeout=10):
+        try:
+            by, value = self.get_locator(locator)
+            element = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable((by, value)))
+            ActionChains(self.driver).double_click(element).perform()
+            print(f"Double clicked on element with locator: {locator}")
+
+        except TimeoutException:
+            print(f"Element with locator: {locator} not found")
+        except StaleElementReferenceException:
+            print(f"Element with locator: {locator} is not attached to the page document")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
 
     def right_click_element(self, locator, timeout=10):
         element = self.find_element(locator, timeout)
