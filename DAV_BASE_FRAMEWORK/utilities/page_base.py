@@ -56,7 +56,7 @@ class PageBase:
     # def double_click_element(self, locator, timeout=10):
     #     element = self.find_element(locator, timeout)
     #     ActionChains(self.driver).double_click(element).perform()
-    def double_click(self, locator, timeout=10):
+    def double_click_element(self, locator, timeout=10):
         try:
             by, value = self.get_locator(locator)
             element = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable((by, value)))
