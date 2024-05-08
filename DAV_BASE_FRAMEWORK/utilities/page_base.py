@@ -53,14 +53,12 @@ class PageBase:
         element = self.find_element(locator, timeout)
         element.click()
 
-    # def double_click_element(self, locator, timeout=10):
-    #     element = self.find_element(locator, timeout)
-    #     ActionChains(self.driver).double_click(element).perform()
     def double_click_element(self, locator, timeout=10):
         try:
             by, value = self.get_locator(locator)
             element = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable((by, value)))
-            ActionChains(self.driver).double_click(element).perform()
+            self.driver.execute_script("var evt = new MouseEvent('dblclick', { bubbles: true, cancelable: true, "
+                                       "view: window });arguments[0].dispatchEvent(evt);", element)
             print(f"Double clicked on element with locator: {locator}")
 
         except TimeoutException:
