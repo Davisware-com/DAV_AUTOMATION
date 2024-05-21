@@ -57,8 +57,8 @@ class PageBase:
         try:
             by, value = self.get_locator(locator)
             element = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable((by, value)))
-            self.driver.execute_script("var evt = new MouseEvent('dblclick', { bubbles: true, cancelable: true, "
-                                       "view: window });arguments[0].dispatchEvent(evt);", element)
+            action_chains = ActionChains(self.driver)
+            action_chains.double_click(element).perform()
             print(f"Double clicked on element with locator: {locator}")
 
         except TimeoutException:
