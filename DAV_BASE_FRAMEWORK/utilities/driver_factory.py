@@ -1,53 +1,53 @@
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
+
+from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from DAV_BASE_FRAMEWORK.utilities.webdriver_listener import WebDriverListener
 from msedge.selenium_tools import EdgeOptions, Edge
 from DAV_BASE_FRAMEWORK.utilities.webdriver_extended import WebDriverExtended
 
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+
 
 class DriverFactory:
+
     @staticmethod
     def get_driver(config) -> WebDriverExtended:
+
         if config["browser"] == "chrome":
-            options = webdriver.ChromeOptions()
+            options = ChromeOptions()
             options.add_argument("start-maximized")
-            if config["headless_mode"] is True:
-                options.add_argument("--headless")
-            if config["chrome_driver_manager"] is True:
-                driver = WebDriverExtended(
-                    webdriver.Chrome(ChromeDriverManager().install(), options=options),
-                    WebDriverListener(), config
-                )
-                return driver
-            else:
-                driver = WebDriverExtended(
-                    webdriver.Chrome(executable_path='C:/Users/BHARGAV.PULIKONDA/Drivers/chromedriver-win64'
-                                                     '/chromedriver.exe', options=options),
-                    WebDriverListener(), config
-                )
-                return driver
+
+            if config["headless_mode"]:
+                options.add_argument("--headless=new")
+
+            options.add_experimental_option("detach", True)
+            driver = webdriver.Chrome(options=options)
+
         elif config["browser"] == "firefox":
-            options = webdriver.FirefoxOptions()
-            options.add_argument("start-maximized")
-            if config["headless_mode"] is True:
+            options = FirefoxOptions()
+            if config["headless_mode"]:
                 options.headless = True
-            driver = WebDriverExtended(
-                webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options),
-                WebDriverListener(), config
-            )
-            return driver
+            driver = webdriver.Firefox(options=options)
+            driver.maximize_window()
+
         elif config["browser"] == "edge":
             options = EdgeOptions()
-            options.add_argument("start-maximized")
             options.use_chromium = True
-            if config["headless_mode"] is True:
-                options.headless = True
-            driver_path = EdgeChromiumDriverManager().install()
-            driver = WebDriverExtended(
-                Edge(executable_path=driver_path, options=options),
-                WebDriverListener(), config
-            )
-            return driver
-        raise Exception("Provide valid driver name")
+            options.add_argument("start-maximized")
+
+            if config["headless_mode"]:
+                options.add_argument("--headless=new")
+
+            # options.add_experimental_option("detach", True)
+            # driver = webdriver.Edge(options=options)
+            service = EdgeService(EdgeChromiumDriverManager(cache_valid_range=30).install())
+            driver = webdriver.Edge(service=service, options=options)
+
+        else:
+            raise Exception("Provide valid browser name")
+
+        return WebDriverExtended(driver, WebDriverListener(), config)
+
